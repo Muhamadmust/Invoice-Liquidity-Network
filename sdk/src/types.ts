@@ -68,3 +68,10 @@ export interface NetworkConfig {
   rpcUrl: string;
   networkPassphrase: string;
 }
+
+export interface CompatibilityResult {
+  compatible: boolean;
+  contractVersion: string;
+  sdkVersion: string;
+  issues: string[];
+}

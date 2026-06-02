@@ -20,7 +20,10 @@ import type {
   RpcServerLike,
   SubmitInvoiceParams,
   TransactionSigner,
+  CompatibilityResult,
 } from "./types";
+
+import { checkCompatibility } from "./compatibility";
 
 const READ_ACCOUNT = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
 const POLL_ATTEMPTS = 20;
@@ -45,6 +48,16 @@ export class ILNSdk {
     this.networkPassphrase = config.networkPassphrase;
     this.server = config.server ?? new rpc.Server(config.rpcUrl);
     this.signer = config.signer;
+  }
+
+  async checkCompatibility(): Promise<CompatibilityResult> {
+    const invoke = async (method: string): Promise<any> => {
+      const transaction = this.buildReadTransaction(method, []);
+      const simulation = await this.server.simulateTransaction(transaction);
+      return scValToNative(this.extractSimulationRetval(simulation, method));
+    };
+
+    return checkCompatibility(invoke);
   }
 
   async submitInvoice(params: SubmitInvoiceParams): Promise<bigint> {

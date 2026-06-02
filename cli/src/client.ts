@@ -119,6 +119,12 @@ export class ILNClient {
     return invoices;
   }
 
+  async getVersion(): Promise<string> {
+    const transaction = this.buildReadTransaction("get_version", []);
+    const simulation = await this.simulate(transaction, "get_version");
+    return String(this.unwrapContractResult(this.extractRetval(simulation), "get_version"));
+  }
+
   private buildReadTransaction(method: string, args: xdr.ScVal[]) {
     return new TransactionBuilder(new Account(READ_ACCOUNT, "0"), {
       fee: BASE_FEE,
